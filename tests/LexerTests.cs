@@ -24,6 +24,22 @@ namespace Tests
         }
 
         [Fact]
+        public void Lexer_Should_Add_Diagnostics_For_Bad_Numbers()
+        {
+            var numberToTest = (int.MaxValue + 1L).ToString();
+            var lexer = new Lexer(numberToTest);
+            var token = lexer.NextToken();
+
+            using (new AssertionScope())
+            {
+                token.Kind.Should().Be(SyntaxKind.NumberToken);
+                token.Position.Should().Be(0);
+                token.Text.Should().Be(numberToTest);
+                lexer.Diagnostics.Should().Contain($"The number {numberToTest} isn't valid Int32.");
+            }
+        }
+
+        [Fact]
         public void Lexer_Should_Tokenize_Whitespace()
         {
             var lexer = new Lexer(" ");
@@ -146,15 +162,17 @@ namespace Tests
         [Fact]
         public void Lexer_Should_Tokenize_BadToken()
         {
-            var lexer = new Lexer("@");
+            var badTokenText = "@";
+            var lexer = new Lexer(badTokenText);
             var token = lexer.NextToken();
 
             using (new AssertionScope())
             {
                 token.Kind.Should().Be(SyntaxKind.BadToken);
                 token.Position.Should().Be(0);
-                token.Text.Should().Be("@");
+                token.Text.Should().Be(badTokenText);
                 token.Value.Should().BeNull();
+                lexer.Diagnostics.Should().Contain($"ERROR: bad character input: '{badTokenText}'");
             }
         }
     }
