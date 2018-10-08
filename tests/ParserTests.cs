@@ -58,10 +58,7 @@ namespace Tests
         }
 
         [Theory]
-        [InlineData('*', SyntaxKind.StarToken)]
-        [InlineData('/', SyntaxKind.SlashToken)]
-        [InlineData('+', SyntaxKind.PlusToken)]
-        [InlineData('-', SyntaxKind.MinusToken)]
+        [ClassData(typeof(ParserTestDataOperators))]
         internal void Parser_Should_Parse_BinaryExpression_Expression(char binaryOperator, SyntaxKind expectedSyntaxKind)
         {
             var expression = $"4 {binaryOperator} 2";
